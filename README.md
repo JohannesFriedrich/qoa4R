@@ -1,0 +1,126 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# qoa
+
+QOA is fast. It decodes audio 3x faster than Ogg-Vorbis, while offering
+better quality and compression (278 kbits/s for 44khz stereo) than
+ADPCM.
+
+<https://qoaformat.org/>
+
+This **R**-package is a wrapper to handle QOA files with **R**. The
+package is completely written in base R with no dependencies and pure
+C-code. To handle the raw audio data the R-package `tuneR`is highly
+recommended.
+
+See this blogpost for an introduction
+<https://phoboslab.org/log/2023/02/qoa-time-domain-audio-compression>
+
+<!-- badges: start -->
+
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+
+<!-- badges: end -->
+
+## Installation
+
+You can install the development version from GitHub with the following
+command:
+
+``` r
+if (!require("devtools")) install.packages("devtools")
+devtools::install_github("JohannesFriedrich/qoa4R")
+```
+
+## Usage
+
+There are just two main functions: `readQOA()` and `writeQOA()`.
+
+- `readQOA()`: Takes an qoa-format audio file and decodes it into it´s
+  raw audio data. Return value is a list with decoded values represented
+  as matrix, used channels, sample rate and samples.
+- `writeQOA()`: Takes an matrix with every channel in new column and the
+  sample rate as input and and encodes it into an qoa audio file.
+
+### `readQOA()`
+
+Let´s read in an QOA-file delivered with this package:
+
+``` r
+library(qoa)
+qoa_file <- system.file("extdata", "58_guitar_sarasate_stereo.qoa", package = "qoa")
+qoa_data <- readQOA(qoa_file)
+```
+
+`qoa_data` is a list with the following elements: \* `data`: a matrix
+with all the samples. The dimension of the matrix is samples x channels
+\* `channels`: Number of channels \* `samples`: Number of samples per
+channel \* `samplerate`: Sample rate of the file
+
+It is possible to write these samples and information with the `tuneR`
+package back to an wave file:
+
+``` r
+tuneR::writeWave(
+  WaveMC(
+    data = qoa_data$data, 
+    samp.rate = qoa_data$samplerate, 
+    bit = 16), 
+  "wave_from_qoa.wav", 
+  extensible = FALSE)
+```
+
+### `writeQOA()`
+
+With this function it is possible to write an qoa-file. The input
+arguments are:
+
+- samples: a matrix with dimensions samples x channels
+- samplerate: samplerate of the audio file
+- target: Either name of the file to write, a binary connection or a raw
+  vector indicating that the output should be a raw vector (the
+  hex-interpretation of the qoa-file).
+
+If no second argument is given, the returned value is the
+hex-interpretation of the image in the QOI-file format.
+
+``` r
+wav_original <- tuneR::readWave("wave_from_qoa.wav", toWaveMC = TRUE)
+writeQOA(samples = wav_original@.Data, 
+         samplerate = wav_original@samp.rate)
+```
+
+If an second argument is given as character the image is saved to this
+name:
+
+``` r
+writeQOA(samples = wav_original@.Data, 
+         samplerate = wav_original@samp.rate, 
+         target = "test.qoa")
+```
+
+If the second argument is of type `connection` the hex interpretation of
+the audio file will be send to this connection, e.g. via sockets or FTP.
+
+``` r
+file <- file("file.qoa", "wb")
+writeQOA(samples = wav_original@.Data, 
+         samplerate = wav_original@samp.rate, 
+         target = "test.qoa")
+close(file)
+```
+
+## Acknowlegment
+
+This package would not exist without the following
+persons/homepages/tutorial/…:
+
+- [Phoboslab - original specification](https://github.com/phoboslab/qoa)
+- [Example C-code
+  R-package](https://github.com/coolbutuseless/simplecall)
+- [R
+  extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html)
+- [Hadley´s R-Internals](https://github.com/hadley/r-internals)

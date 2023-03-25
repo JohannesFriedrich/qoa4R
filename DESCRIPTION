@@ -1,0 +1,20 @@
+Package: qoa
+Type: Package
+Title: Read and Write QOA audio files
+Date: 2023-03-25
+Version: 0.0.1
+Author: Johannes Friedrich [aut, trl, cre],
+        Dominic Szablewski [cph] (C library 'qoi')
+Authors@R: c(person("Johannes", "Friedrich", role = c("aut", "trl","cre"), email = c("Johannes.Friedrich@posteo.de")),
+             person("Dominic", "Szablewski", role = c("cph"), comment = c("C library 'qoi'")))
+Maintainer: Johannes Friedrich <Johannes.Friedrich@posteo.de>
+URL: https://github.com/JohannesFriedrich/qoa4R
+BugReports: https://github.com/JohannesFriedrich/qoa4R/issues
+Description: The new QOA file format offers a very simple but efficient audio compression algorithm. This package provides an easy and simple way to read and write QOA (Quite Ok Audio) format.
+License: GPL (>= 3)
+Encoding: UTF-8
+NeedsCompilation: yes
+RoxygenNote: 7.2.3
+Depends: 
+    R (>= 2.10)
+LazyData: true
